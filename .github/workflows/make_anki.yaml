@@ -1,5 +1,8 @@
 name: Build Anki Deck
 
+permissions:
+  contents: write   # needed for release upload
+
 on:
   push:
     branches: [ main ]
@@ -12,11 +15,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     env:
+      # If using DeepSeek, set these repo secrets:
+      # OPENAI_API_KEY: your deepseek key
+      # OPENAI_BASE_URL: https://api.deepseek.com
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }} # optional, if you use a compatible endpoint
-      OPENAI_MODEL: gpt-4o-mini                      # or your model name
+      OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+      OPENAI_MODEL: deepseek-reasoner   # or deepseek-chat (see your script logic)
       TTS_LANG: en
 
     steps:
@@ -31,8 +36,19 @@ jobs:
 
       - name: Install deps
         run: |
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Show selected model & base (debug)
+        run: |
+          echo "MODEL=${OPENAI_MODEL}"
+          echo "BASE_URL=${OPENAI_BASE_URL}"
+          python - <<'PY'
+from pathlib import Path
+p = Path("scripts/ai_enrich.py").read_text()
+print("uses_responses =", "responses.create(" in p)
+print("uses_chat      =", "chat.completions.create(" in p)
+PY
 
       - name: Enrich with AI
         run: python scripts/ai_enrich.py
@@ -52,16 +68,15 @@ jobs:
             out/enriched.csv
           if-no-files-found: error
 
-      # Optional: create a GitHub Release with the deck
-	- name: Create release
-	  if: ${{ github.ref == 'refs/heads/main' }}
-	  uses: softprops/action-gh-release@v2
-	  with:
-	    tag_name: deck-${{ github.run_number }}
-	    name: "Deck build #${{ github.run_number }}"
-	    files: out/deck.apkg
-	  env:
-	    GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-          permissions:
-            contents: write
-	    
+      # Optional: create a GitHub Release with the deck (requires contents: write at top)
+      - name: Create release
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: deck-${{ github.run_number }}
+          name: "Deck build #${{ github.run_number }}"
+          files: out/deck.apkg
+        env:
+          # Default GITHUB_TOKEN now has contents:write due to top-level permissions
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
