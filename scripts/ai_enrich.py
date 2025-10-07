@@ -7,7 +7,7 @@ from openai import OpenAI
 ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT/".env")
 
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "deepseek-reasoner")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), base_url=os.getenv("OPENAI_BASE_URL"))
 
 system = (ROOT/"prompts/system.txt").read_text(encoding="utf-8")
