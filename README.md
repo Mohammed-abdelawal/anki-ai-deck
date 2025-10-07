@@ -1,4 +1,4 @@
-# anki-ai-deck
+# anki-ai-deck (for lazy people) 
 Generate Anki/AnkiDroid vocab decks from a simple EN/AR list using AI and TTS.
 
 ## What it does
