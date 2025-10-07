@@ -8,9 +8,9 @@ ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT / ".env")
 
 # Accept either DeepSeek_* or OPENAI_* names (GH Actions secrets friendly)
-API_KEY = os.getenv("DEEPSEEK_API_KEY") or os.getenv("OPENAI_API_KEY")
-BASE_URL = os.getenv("DEEPSEEK_API_BASE") or os.getenv("OPENAI_BASE_URL") or "https://api.deepseek.com"
-MODEL = os.getenv("OPENAI_MODEL", "deepseek-reasoner")  # your choice
+API_KEY = os.getenv("OPENAI_API_KEY")
+BASE_URL = os.getenv("OPENAI_BASE_URL") or "https://api.deepseek.com"
+MODEL = "deepseek-chat"
 
 client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 
