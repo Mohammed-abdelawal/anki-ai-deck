@@ -39,17 +39,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Show selected model & base (debug)
-        run: |
-          echo "MODEL=${OPENAI_MODEL}"
-          echo "BASE_URL=${OPENAI_BASE_URL}"
-          python - <<'PY'
-from pathlib import Path
-p = Path("scripts/ai_enrich.py").read_text()
-print("uses_responses =", "responses.create(" in p)
-print("uses_chat      =", "chat.completions.create(" in p)
-PY
-
       - name: Enrich with AI
         run: python scripts/ai_enrich.py
 
@@ -79,4 +68,5 @@ PY
         env:
           # Default GITHUB_TOKEN now has contents:write due to top-level permissions
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
