@@ -52,22 +52,16 @@ jobs:
             out/enriched.csv
           if-no-files-found: error
 
-      # Optional: auto-commit enriched.csv back to repo
-      - name: Auto commit updated CSV
-        if: ${{ github.ref == 'refs/heads/main' }}
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: update enriched.csv from CI"
-          file_pattern: out/enriched.csv
-
       # Optional: create a GitHub Release with the deck
-      - name: Create release
-        if: ${{ github.ref == 'refs/heads/main' }}
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: deck-${{ github.run_number }}
-          name: "Deck build #${{ github.run_number }}"
-          files: out/deck.apkg
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+	- name: Create release
+	  if: ${{ github.ref == 'refs/heads/main' }}
+	  uses: softprops/action-gh-release@v2
+	  with:
+	    tag_name: deck-${{ github.run_number }}
+	    name: "Deck build #${{ github.run_number }}"
+	    files: out/deck.apkg
+	  env:
+	    GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          permissions:
+            contents: write
+	    

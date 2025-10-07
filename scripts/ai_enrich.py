@@ -20,8 +20,9 @@ out_path = ROOT / "out/enriched.csv"
 out_path.parent.mkdir(parents=True, exist_ok=True)
 
 cols = [
-    "Word","Meaning_EN","Meaning_AR","IPA","Part_of_Speech","Example_EN","Example_AR",
-    "Collocations","Synonyms","Antonyms","Notes","Tags","Sound"
+  "Word","Meaning_EN","Meaning_AR","IPA","Part_of_Speech",
+  "Example_EN","Example_AR","Collocations","Synonyms","Antonyms",
+  "Notes","Tags","Sound","Example_Sound"
 ]
 
 def _ensure_fields(d: dict) -> dict:
@@ -90,6 +91,7 @@ def main():
             "Notes": data.get("Notes",""),
             "Tags": data.get("Tags",""),
             "Sound": f"[sound:{word}.mp3]",
+            "Example_Sound": "", 
         })
 
     pd.DataFrame(rows, columns=cols).to_csv(out_path, index=False, encoding="utf-8-sig")
