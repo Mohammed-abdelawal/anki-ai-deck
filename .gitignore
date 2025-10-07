@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+out/*.apkg
+out/enriched.csv
+out/media/*
+!.keep
+.env

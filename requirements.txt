@@ -1,0 +1,6 @@
+pandas==2.2.2
+openai>=1.14.3
+python-dotenv>=1.0.1
+gTTS>=2.5.1
+genanki==0.13.1
+PyYAML>=6.0.2

@@ -1,0 +1,73 @@
+name: Build Anki Deck
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "data/words.csv"
+      - "prompts/**"
+      - "scripts/**"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }} # optional, if you use a compatible endpoint
+      OPENAI_MODEL: gpt-4o-mini                      # or your model name
+      TTS_LANG: en
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install deps
+        run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+
+      - name: Enrich with AI
+        run: python scripts/ai_enrich.py
+
+      - name: Generate audio (gTTS)
+        run: python scripts/tts.py
+
+      - name: Build deck
+        run: python scripts/build_deck.py
+
+      - name: Upload deck artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: anki-deck
+          path: |
+            out/deck.apkg
+            out/enriched.csv
+          if-no-files-found: error
+
+      # Optional: auto-commit enriched.csv back to repo
+      - name: Auto commit updated CSV
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update enriched.csv from CI"
+          file_pattern: out/enriched.csv
+
+      # Optional: create a GitHub Release with the deck
+      - name: Create release
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: deck-${{ github.run_number }}
+          name: "Deck build #${{ github.run_number }}"
+          files: out/deck.apkg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

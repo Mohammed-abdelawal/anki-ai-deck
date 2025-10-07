@@ -1,0 +1,5 @@
+# Basic config
+deck_name: "Vocab EN-AR"
+deck_id: 2087654321
+tts_lang: "en"
+model_name: "${OPENAI_MODEL:-gpt-4o-mini}"

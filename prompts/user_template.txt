@@ -1,0 +1,8 @@
+Fill missing fields for this entry. Keep provided values as-is.
+
+ENTRY:
+Word: {word_en}
+Meaning_AR: {word_ar}
+
+If any of these fields already exist, keep them unchanged:
+{existing_fields}
